@@ -50,55 +50,18 @@ export default function SceneContainer({
   return (
     <div
       data-testid={testId}
-      className={`
-        relative
-        w-full
-        min-h-screen
-        overflow-hidden
-        bg-cover
-        bg-center
-        bg-no-repeat
-        ${className}
-      `}
+      className={`relative w-full min-h-screen overflow-hidden bg-cover bg-center bg-no-repeat ${className}`}
       style={backgroundStyle}
-      role="presentation"
-      aria-hidden="true"
     >
       {/* Dark gradient overlay for text readability */}
       <div
-        className="
-          absolute
-          inset-0
-          z-10
-          bg-gradient-to-b
-          from-black/40
-          via-black/60
-          to-black/80
-        "
+        className="absolute inset-0 z-10 bg-gradient-to-b from-black/40 via-black/60 to-black/80"
         style={{ opacity: overlayOpacity }}
         aria-hidden="true"
       />
 
-      {/* Content container - responsive padding and max-width */}
-      <div
-        className="
-          relative
-          z-20
-          flex
-          flex-col
-          min-h-screen
-          max-h-screen
-          overflow-y-auto
-          px-4
-          py-4
-          sm:px-5
-          sm:py-5
-          md:px-6
-          md:py-6
-          lg:max-w-2xl
-          lg:mx-auto
-        "
-      >
+      {/* Content container */}
+      <div className="relative z-20 min-h-screen">
         {children}
       </div>
     </div>

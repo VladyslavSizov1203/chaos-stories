@@ -62,7 +62,9 @@ export default function Home() {
     makeChoice,
     showOutcome,
     completeOutcome,
+    completeTransition,
     setDead,
+    reachEnding,
     restart,
   } = useGameState();
 
@@ -80,15 +82,16 @@ export default function Home() {
       // Transition hook handles its own state
     },
     onSceneReady: (scene) => {
-      // This will be called when transition completes
-      // We'll handle the game state update in handleOutcomeComplete
+      // Update game state: transitioning → scene_display
+      completeTransition(scene);
     },
     onTransitionComplete: () => {
+      // Update game state: scene_display → showing_choices
       showChoices();
     },
     onEndingReached: (scene) => {
       console.log('Ending reached:', scene.id);
-      // Ending handling will be done via the game state machine
+      reachEnding(scene);
     },
   });
 

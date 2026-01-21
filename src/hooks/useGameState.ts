@@ -112,6 +112,7 @@ export interface UseGameStateReturn {
   completeTransition: (nextScene: Scene) => void;
   setDead: (deathText: string) => void;
   setEnding: (ending: Ending) => void;
+  reachEnding: (endingScene: Scene) => void;
   restart: () => void;
 }
 
@@ -299,13 +300,14 @@ export function useGameState(): UseGameStateReturn {
 
   const completeTransition = useCallback(
     (nextScene: Scene) => {
+      // Use stateRef for immediate access to current scene
       transition('scene_display', {
-        previousSceneId: state.currentScene?.id ?? null,
+        previousSceneId: stateRef.current.currentScene?.id ?? null,
         currentScene: nextScene,
         selectedChoice: null,
       });
     },
-    [state.currentScene, transition]
+    [transition]
   );
 
   const setDead = useCallback(
@@ -324,6 +326,22 @@ export function useGameState(): UseGameStateReturn {
       });
     },
     [transition]
+  );
+
+  const reachEnding = useCallback(
+    (endingScene: Scene) => {
+      // For ending scenes, we set the scene directly and transition to ending state
+      const newState = {
+        ...stateRef.current,
+        flowState: 'ending' as GameFlowState,
+        previousSceneId: stateRef.current.currentScene?.id ?? null,
+        currentScene: endingScene,
+        selectedChoice: null,
+      };
+      stateRef.current = newState;
+      setState(newState);
+    },
+    []
   );
 
   const restart = useCallback(() => {
@@ -351,6 +369,7 @@ export function useGameState(): UseGameStateReturn {
     completeTransition,
     setDead,
     setEnding,
+    reachEnding,
     restart,
   };
 }

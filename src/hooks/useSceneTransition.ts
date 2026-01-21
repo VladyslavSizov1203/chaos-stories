@@ -90,6 +90,20 @@ export function useSceneTransition(
     timeoutIds: NodeJS.Timeout[];
   }>({ cancelled: false, timeoutIds: [] });
 
+  // Store callbacks in refs to avoid stale closures in timeouts
+  const callbackRefs = useRef({
+    onTransitionStart,
+    onSceneReady,
+    onTransitionComplete,
+    onEndingReached,
+  });
+  callbackRefs.current = {
+    onTransitionStart,
+    onSceneReady,
+    onTransitionComplete,
+    onEndingReached,
+  };
+
   // Preloaded images cache
   const preloadedImages = useRef<Set<string>>(new Set());
 
@@ -139,12 +153,12 @@ export function useSceneTransition(
 
       // Check if this is an ending scene
       if (nextScene.isEnding) {
-        onEndingReached?.(nextScene);
+        callbackRefs.current.onEndingReached?.(nextScene);
         return;
       }
 
       // Notify transition start
-      onTransitionStart?.();
+      callbackRefs.current.onTransitionStart?.();
 
       // Start fade out
       setTransitionState('fading-out');
@@ -169,7 +183,7 @@ export function useSceneTransition(
           if (transitionRef.current.cancelled) return;
 
           // Scene is ready - notify and start fade in
-          onSceneReady?.(nextScene);
+          callbackRefs.current.onSceneReady?.(nextScene);
 
           setTransitionState('fading-in');
           setOpacity(1);
@@ -179,7 +193,7 @@ export function useSceneTransition(
             if (transitionRef.current.cancelled) return;
 
             setTransitionState('idle');
-            onTransitionComplete?.(nextScene);
+            callbackRefs.current.onTransitionComplete?.(nextScene);
           }, fadeInDuration);
         });
       }, fadeOutDuration);
