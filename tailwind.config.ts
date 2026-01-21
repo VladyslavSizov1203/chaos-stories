@@ -24,9 +24,44 @@ const config: Config = {
             transform: 'translateY(0)',
           },
         },
+        'fade-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
+        'fade-out': {
+          from: { opacity: '1' },
+          to: { opacity: '0' },
+        },
+        'scene-enter': {
+          from: {
+            opacity: '0',
+            transform: 'scale(1.02)',
+          },
+          to: {
+            opacity: '1',
+            transform: 'scale(1)',
+          },
+        },
+        'scene-exit': {
+          from: {
+            opacity: '1',
+            transform: 'scale(1)',
+          },
+          to: {
+            opacity: '0',
+            transform: 'scale(0.98)',
+          },
+        },
       },
       animation: {
         'slide-up': 'slide-up 300ms ease-out',
+        'fade-in': 'fade-in 300ms ease-out',
+        'fade-out': 'fade-out 300ms ease-out',
+        'scene-enter': 'scene-enter 300ms ease-out',
+        'scene-exit': 'scene-exit 300ms ease-out',
+      },
+      transitionDuration: {
+        '300': '300ms',
       },
     },
   },
