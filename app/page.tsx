@@ -1,10 +1,11 @@
 /**
- * Demo Page - SceneContainer, StoryText, and ChoiceList Components
+ * Demo Page - Full Game Loop Components
  *
  * Displays the tavern entrance scene to demonstrate:
  * - SceneContainer with background gradient
  * - StoryText component
  * - ChoiceList with character filtering
+ * - OutcomeDisplay with auto-dismiss flow
  *
  * This page serves as a visual test for responsive behavior and styling.
  */
@@ -15,25 +16,42 @@ import { useState } from 'react';
 import SceneContainer from '@/src/components/SceneContainer';
 import StoryText from '@/src/components/StoryText';
 import { ChoiceList } from '@/src/components/ChoiceList';
+import OutcomeDisplay from '@/src/components/OutcomeDisplay';
 import { tavernEntranceScene } from '@/src/data/test-scenes';
 import { Choice } from '@/src/types/game';
 
 export default function Home() {
   // Character selection state for testing character-specific choices
   const [selectedCharacter, setSelectedCharacter] = useState<'rupert' | 'milo'>('rupert');
-  const [lastChoice, setLastChoice] = useState<string | null>(null);
+
+  // Outcome display state
+  const [showOutcome, setShowOutcome] = useState(false);
+  const [selectedChoice, setSelectedChoice] = useState<Choice | null>(null);
+  const [showNextSceneMessage, setShowNextSceneMessage] = useState(false);
 
   // Using a placeholder gradient since we don't have actual images yet
   // In production, this would be: tavernEntranceScene.backgroundImage
   const placeholderBackground = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
 
   const handleChoiceSelect = (choice: Choice) => {
-    setLastChoice(`${choice.text} (Chaos: ${choice.chaosChange > 0 ? '+' : ''}${choice.chaosChange})`);
+    // Show the outcome display
+    setSelectedChoice(choice);
+    setShowOutcome(true);
+    setShowNextSceneMessage(false);
+  };
 
-    // Simulate choice processing - in real game, this would transition to outcome display
+  const handleOutcomeComplete = () => {
+    // Hide outcome and show "Next scene" message
+    setShowOutcome(false);
+
+    // Show next scene message
+    setShowNextSceneMessage(true);
+
+    // After 2 seconds, hide message and allow new choice selection
     setTimeout(() => {
-      setLastChoice(null);
-    }, 3000);
+      setShowNextSceneMessage(false);
+      setSelectedChoice(null);
+    }, 2000);
   };
 
   return (
@@ -87,25 +105,39 @@ export default function Home() {
         position="top"
       />
 
-      {/* Show last selected choice */}
-      {lastChoice && (
-        <div className="absolute top-20 left-4 right-4 mt-4 p-3 bg-emerald-500/90 rounded-lg text-white text-sm text-center animate-slide-up">
-          <strong>Selected:</strong> {lastChoice}
+      {/* ChoiceList - hidden when outcome is showing */}
+      {!showOutcome && !showNextSceneMessage && (
+        <ChoiceList
+          choices={tavernEntranceScene.choices}
+          selectedCharacter={selectedCharacter}
+          onChoiceSelect={handleChoiceSelect}
+        />
+      )}
+
+      {/* OutcomeDisplay - shows after choice selection */}
+      {showOutcome && selectedChoice && (
+        <OutcomeDisplay
+          outcomeText={selectedChoice.outcomeText}
+          chaosChange={selectedChoice.chaosChange}
+          onComplete={handleOutcomeComplete}
+        />
+      )}
+
+      {/* Next scene message */}
+      {showNextSceneMessage && (
+        <div className="absolute bottom-24 left-4 right-4 p-4 bg-emerald-500/90 rounded-lg text-white text-center animate-fade-in">
+          <p className="text-lg font-semibold">Next scene would load here...</p>
+          <p className="text-sm mt-1 opacity-80">
+            Chaos changed by {selectedChoice?.chaosChange}
+          </p>
         </div>
       )}
 
-      {/* ChoiceList component */}
-      <ChoiceList
-        choices={tavernEntranceScene.choices}
-        selectedCharacter={selectedCharacter}
-        onChoiceSelect={handleChoiceSelect}
-      />
-
       {/* Demo info */}
       <div className="absolute bottom-0 left-0 right-0 text-center text-white/60 text-xs pb-2 bg-gradient-to-t from-black/50 to-transparent pt-8">
-        <p>ChoiceList Component Demo</p>
+        <p>Full Game Loop Demo</p>
         <p className="mt-1">
-          Toggle character to see filtering | Tap choices to test interaction
+          Toggle character | Select choice to see outcome display flow
         </p>
       </div>
     </SceneContainer>
