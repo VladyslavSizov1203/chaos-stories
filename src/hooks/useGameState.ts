@@ -196,11 +196,15 @@ export function useGameState(): UseGameStateReturn {
 
     console.log(`[GameState] Transition: ${from} → ${to}`);
 
-    setState(prev => ({
-      ...prev,
+    // Update ref immediately so chained synchronous calls see the new state
+    const newState = {
+      ...stateRef.current,
       flowState: to,
       ...updater,
-    }));
+    };
+    stateRef.current = newState;
+
+    setState(newState);
 
     return true;
   }, []);
@@ -239,23 +243,26 @@ export function useGameState(): UseGameStateReturn {
 
   const makeChoice = useCallback(
     (choice: Choice) => {
-      // Just store the choice without transitioning (we're already in showing_choices)
-      setState(prev => ({
-        ...prev,
+      // Update ref immediately so chained synchronous calls see the choice
+      const newState = {
+        ...stateRef.current,
         selectedChoice: choice,
-      }));
+      };
+      stateRef.current = newState;
+      setState(newState);
     },
     []
   );
 
   const showOutcome = useCallback(() => {
-    if (!state.selectedChoice) {
+    // Check ref instead of state for synchronous calls
+    if (!stateRef.current.selectedChoice) {
       console.error('[GameState] Cannot show outcome: no choice selected');
       return;
     }
 
     transition('showing_outcome');
-  }, [state.selectedChoice, transition]);
+  }, [transition]);
 
   const completeOutcome = useCallback(
     (chaosChange: number) => {
