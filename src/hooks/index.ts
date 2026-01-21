@@ -8,3 +8,11 @@ export type {
   UseSceneTransitionOptions,
   UseSceneTransitionReturn,
 } from './useSceneTransition';
+
+export { useGameState } from './useGameState';
+export type {
+  GameFlowState,
+  GameState,
+  GameAction,
+  UseGameStateReturn,
+} from './useGameState';
