@@ -31,6 +31,10 @@ export interface Choice {
   characterOnly?: 'rupert' | 'milo';
   chaosVariance?: { min: number; max: number };
   isMagic?: boolean; // For Milo's spell backfire checks
+  deathCondition?: {
+    minChaos: number;  // If chaos >= this, player dies
+  };
+  deathText?: string;  // Text shown on death
 }
 
 // === SCENE ===
@@ -42,6 +46,10 @@ export interface Scene {
   isEnding?: boolean;
   arrivalVariants?: {
     [fromSceneId: string]: { text: string; };
+  };
+  characterFlavor?: {
+    rupert?: string;
+    milo?: string;
   };
 }
 
